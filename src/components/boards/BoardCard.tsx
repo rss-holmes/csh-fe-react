@@ -36,7 +36,7 @@ export function BoardCard({ board, onEdit }: BoardCardProps) {
   const deleteMutation = useMutation({
     mutationFn: () => boardApi.deleteBoard(board.id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.boards.workspaceBoards._def })
+      queryClient.invalidateQueries({ queryKey: queryKeys.boards.all })
       toast.success('Board deleted successfully')
     },
     onError: () => {
@@ -49,7 +49,7 @@ export function BoardCard({ board, onEdit }: BoardCardProps) {
       isPublic: !board.isPublic 
     }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.boards.workspaceBoards._def })
+      queryClient.invalidateQueries({ queryKey: queryKeys.boards.all })
       toast.success(`Board is now ${board.isPublic ? 'private' : 'public'}`)
     },
     onError: () => {
@@ -158,7 +158,7 @@ export function BoardCard({ board, onEdit }: BoardCardProps) {
         <div className="flex flex-wrap gap-2 mb-4">
           <Badge 
             variant="outline" 
-            className={`text-xs ${getStatusColor(board.status)}`}
+            className={`text-xs ${getStatusColor(board.status || 'active')}`}
           >
             {board.status || 'Active'}
           </Badge>

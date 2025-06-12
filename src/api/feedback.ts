@@ -174,6 +174,19 @@ export const markAsSpam = async (id: number): Promise<Feedback> => {
 }
 
 /**
+ * Get feedbacks for workspace
+ */
+export const getWorkspaceFeedbacks = async (workspaceId?: string): Promise<Feedback[]> => {
+  try {
+    const url = workspaceId ? `/feedbacks?workspaceId=${workspaceId}` : '/feedbacks'
+    const response = await axiosInstance.get(url)
+    return response.data
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Get workspace feedbacks failed')
+  }
+}
+
+/**
  * Bulk upload feedbacks from a file
  */
 export const bulkUploadFeedbacks = async (fileName: string): Promise<{ message: string; processed: number }> => {
@@ -222,5 +235,17 @@ export const getAICopilotChatReply = async (message: string): Promise<AICopilotR
     return response.data
   } catch (error: any) {
     throw new Error(error.response?.data?.message || 'Get AI copilot chat reply failed')
+  }
+}
+
+/**
+ * Get feedbacks for a specific board
+ */
+export const getBoardFeedbacks = async (boardId: number): Promise<Feedback[]> => {
+  try {
+    const response = await axiosInstance.get(`/boards/${boardId}/feedbacks`)
+    return response.data
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Get board feedbacks failed')
   }
 }

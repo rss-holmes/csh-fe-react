@@ -13,6 +13,13 @@ export interface Board {
   updatedAt: string
   issueCount?: number
   feedbackCount?: number
+  // Additional properties used in components
+  feedbacksCount?: number
+  subscribersCount?: number
+  viewsCount?: number
+  status?: string
+  category?: string
+  activeIssuesCount?: number
 }
 
 export interface BoardIssue {
@@ -42,6 +49,18 @@ export const getBoards = async (): Promise<Board[]> => {
     return response.data
   } catch (error: any) {
     throw new Error(error.response?.data?.message || 'Failed to fetch boards')
+  }
+}
+
+/**
+ * Get all boards for a specific workspace
+ */
+export const getWorkspaceBoards = async (): Promise<Board[]> => {
+  try {
+    const response = await axiosInstance.get('/boards')
+    return response.data
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Failed to fetch workspace boards')
   }
 }
 
@@ -187,5 +206,47 @@ export const makeBoardPrivate = async (id: number): Promise<Board> => {
     return response.data
   } catch (error: any) {
     throw new Error(error.response?.data?.message || 'Failed to make board private')
+  }
+}
+
+/**
+ * Get board statistics
+ */
+export const getBoardStats = async (boardId: number): Promise<{
+  issuesCount: number
+  feedbacksCount: number
+  subscribersCount: number
+  viewsCount: number
+  activityScore: number
+}> => {
+  try {
+    const response = await axiosInstance.get(`/boards/${boardId}/stats`)
+    return response.data
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Failed to get board stats')
+  }
+}
+
+/**
+ * Subscribe to a board
+ */
+export const subscribeToBoard = async (boardId: number): Promise<{ message: string }> => {
+  try {
+    const response = await axiosInstance.post(`/boards/${boardId}/subscribe`)
+    return response.data
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Failed to subscribe to board')
+  }
+}
+
+/**
+ * Unsubscribe from a board
+ */
+export const unsubscribeFromBoard = async (boardId: number): Promise<{ message: string }> => {
+  try {
+    const response = await axiosInstance.delete(`/boards/${boardId}/subscribe`)
+    return response.data
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Failed to unsubscribe from board')
   }
 }

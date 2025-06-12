@@ -43,18 +43,14 @@ import {
   Minus,
   Hash,
   ThumbsUp,
-  ThumbsDown,
-  Flag,
-  CheckCircle2
+  ThumbsDown
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { queryKeys } from '@/lib/queryKeys'
 import * as issueApi from '@/api/issue'
 import * as userApi from '@/api/user'
-import type { Issue } from '@/api/issue'
 import { updateIssueSchema, type UpdateIssueInput } from '@/formSchemas/issueSchema'
 import { formatDateTime } from '@/utils/dateFormatter'
-import { useAuthStore } from '@/stores/authStore'
 
 interface IssueDetailsModalProps {
   isOpen: boolean
@@ -80,7 +76,7 @@ export function IssueDetailsModal({ isOpen, onClose, issueId, canEdit = true }: 
   const [isEditing, setIsEditing] = useState(false)
   const [newComment, setNewComment] = useState('')
   const queryClient = useQueryClient()
-  const { user: currentUser } = useAuthStore()
+  // const { user } = useAuthStore()
 
   const { data: issue, isLoading: issueLoading } = useQuery({
     queryKey: queryKeys.issues.issue(issueId.toString()),
@@ -100,7 +96,7 @@ export function IssueDetailsModal({ isOpen, onClose, issueId, canEdit = true }: 
       title: '',
       description: '',
       priority: 2,
-      status: 'open',
+      status: 'No Status',
     },
   })
 
@@ -111,9 +107,9 @@ export function IssueDetailsModal({ isOpen, onClose, issueId, canEdit = true }: 
         title: issue.title || '',
         description: issue.description || '',
         priority: issue.priority || 2,
-        status: issue.status || 'open',
+        status: issue.status || 'No Status',
         assignedToId: issue.assignedToId,
-        dueDate: issue.dueDate,
+        dueDate: issue.dueDate ? new Date(issue.dueDate) : undefined,
       })
     }
   }, [issue, form])
@@ -122,8 +118,8 @@ export function IssueDetailsModal({ isOpen, onClose, issueId, canEdit = true }: 
     mutationFn: (data: UpdateIssueInput) => issueApi.updateIssue(issueId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.issues.issue(issueId.toString()) })
-      queryClient.invalidateQueries({ queryKey: queryKeys.issues.workspaceIssues._def })
-      queryClient.invalidateQueries({ queryKey: queryKeys.issues.boardIssues._def })
+      queryClient.invalidateQueries({ queryKey: queryKeys.issues.all })
+      queryClient.invalidateQueries({ queryKey: queryKeys.boards.all })
       toast.success('Issue updated successfully')
       setIsEditing(false)
     },

@@ -40,6 +40,7 @@ import {
 import { toast } from 'sonner'
 import { queryKeys } from '@/lib/queryKeys'
 import * as publicBoardsApi from '@/api/publicBoards'
+import type { PublicBoardIssue } from '@/api/publicBoards'
 import { formatDateTime } from '@/utils/dateFormatter'
 import { z } from 'zod'
 
@@ -51,36 +52,6 @@ const publicCommentSchema = z.object({
 })
 
 type PublicCommentInput = z.infer<typeof publicCommentSchema>
-
-interface PublicIssue {
-  id: number
-  title: string
-  description?: string
-  priority: number
-  status: string
-  upvotes?: number
-  downvotes?: number
-  commentsCount?: number
-  createdAt: string
-  updatedAt: string
-  dueDate?: string
-  createdBy?: {
-    id: number
-    name: string
-  }
-  hasVoted?: boolean
-  userVoteType?: 'up' | 'down'
-}
-
-interface PublicComment {
-  id: number
-  content: string
-  createdAt: string
-  author: {
-    name: string
-    isTeamMember?: boolean
-  }
-}
 
 interface IssueDetailsModalPublicProps {
   isOpen: boolean
@@ -103,7 +74,7 @@ export function IssueDetailsModalPublic({ isOpen, onClose, issueId, boardUrl }: 
     queryKey: queryKeys.publicBoards.issueComments(boardUrl, issueId.toString()),
     queryFn: () => publicBoardsApi.getPublicIssueComments(boardUrl, issueId),
     enabled: isOpen && !!issueId,
-  }) as { data: PublicComment[] }
+  })
 
   const form = useForm<PublicCommentInput>({
     resolver: zodResolver(publicCommentSchema),
@@ -129,7 +100,7 @@ export function IssueDetailsModalPublic({ isOpen, onClose, issueId, boardUrl }: 
 
   const addCommentMutation = useMutation({
     mutationFn: (data: PublicCommentInput) => 
-      publicBoardsApi.addPublicComment(boardUrl, issueId, data),
+      publicBoardsApi.addPublicComment(boardUrl, issueId, data.content),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.publicBoards.issueComments(boardUrl, issueId.toString()) })
       toast.success('Comment added successfully')
@@ -142,7 +113,7 @@ export function IssueDetailsModalPublic({ isOpen, onClose, issueId, boardUrl }: 
   })
 
   const reportMutation = useMutation({
-    mutationFn: () => publicBoardsApi.reportPublicIssue(boardUrl, issueId),
+    mutationFn: () => publicBoardsApi.reportPublicIssue(boardUrl, issueId, 'Inappropriate content'),
     onSuccess: () => {
       toast.success('Issue reported. We\'ll review it shortly.')
     },
@@ -204,7 +175,7 @@ export function IssueDetailsModalPublic({ isOpen, onClose, issueId, boardUrl }: 
     }
   }
 
-  const getVoteScore = (issue: PublicIssue) => {
+  const getVoteScore = (issue: PublicBoardIssue) => {
     return (issue.upvotes || 0) - (issue.downvotes || 0)
   }
 
@@ -460,9 +431,9 @@ export function IssueDetailsModalPublic({ isOpen, onClose, issueId, boardUrl }: 
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
                               <span className="font-medium text-sm">
-                                {comment.author.name}
+                                {comment.createdBy.name}
                               </span>
-                              {comment.author.isTeamMember && (
+                              {comment.isWorkspaceMember && (
                                 <Badge variant="secondary" className="text-xs">
                                   Team Member
                                 </Badge>

@@ -1,24 +1,8 @@
 import axiosInstance from '@/utils/axiosBase'
-import type { CreateIssueInput, UpdateIssueInput } from '@/formSchemas/issueSchema'
+import type { CreateIssueInput, UpdateIssueInput, Issue } from '@/formSchemas/issueSchema'
 
-// Issue API response types
-export interface Issue {
-  id: number
-  title: string
-  description: string
-  status: string
-  workspaceId: number
-  isActive: boolean
-  createdAt: string
-  lastUpdatedAt: string
-  feedbackCount?: number
-  upvotes?: number
-  createdBy?: {
-    id: number
-    name: string
-    email: string
-  }
-}
+// Re-export Issue type from schema
+export type { Issue }
 
 export interface IssueFeedback {
   id: number
@@ -166,5 +150,48 @@ export const notifyIssueUsers = async (
     return response.data
   } catch (error: any) {
     throw new Error(error.response?.data?.message || 'Failed to notify users')
+  }
+}
+
+/**
+ * Get all issues for the current workspace (alias for getIssues)
+ */
+export const getWorkspaceIssues = async (): Promise<Issue[]> => {
+  return getIssues()
+}
+
+/**
+ * Get issues for a specific board
+ */
+export const getBoardIssues = async (boardId: number): Promise<Issue[]> => {
+  try {
+    const response = await axiosInstance.get(`/boards/${boardId}/issues`)
+    return response.data
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Get board issues failed')
+  }
+}
+
+/**
+ * Vote on an issue
+ */
+export const voteOnIssue = async (id: number, voteType: 'up' | 'down'): Promise<{ upvotes: number; downvotes: number }> => {
+  try {
+    const response = await axiosInstance.post(`/issues/${id}/vote`, { voteType })
+    return response.data
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Failed to vote on issue')
+  }
+}
+
+/**
+ * Add comment to an issue
+ */
+export const addIssueComment = async (id: number, content: string): Promise<{ message: string }> => {
+  try {
+    const response = await axiosInstance.post(`/issues/${id}/comments`, { content })
+    return response.data
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Failed to add comment')
   }
 }

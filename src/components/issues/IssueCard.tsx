@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -28,6 +27,7 @@ import { toast } from 'sonner'
 import { queryKeys } from '@/lib/queryKeys'
 import * as issueApi from '@/api/issue'
 import type { Issue } from '@/api/issue'
+import type { IssueStatus } from '@/utils/constants'
 import { formatDateTime } from '@/utils/dateFormatter'
 
 interface IssueCardProps {
@@ -42,7 +42,7 @@ export function IssueCard({ issue }: IssueCardProps) {
   const deleteMutation = useMutation({
     mutationFn: () => issueApi.deleteIssue(issue.id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.issues.workspaceIssues._def })
+      queryClient.invalidateQueries({ queryKey: queryKeys.issues.all })
       toast.success('Issue deleted successfully')
     },
     onError: () => {
@@ -51,9 +51,9 @@ export function IssueCard({ issue }: IssueCardProps) {
   })
 
   const updateStatusMutation = useMutation({
-    mutationFn: (status: string) => issueApi.updateIssue(issue.id, { status }),
+    mutationFn: (status: IssueStatus) => issueApi.updateIssue(issue.id, { status }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.issues.workspaceIssues._def })
+      queryClient.invalidateQueries({ queryKey: queryKeys.issues.all })
       toast.success('Issue status updated')
     },
     onError: () => {
@@ -174,18 +174,19 @@ export function IssueCard({ issue }: IssueCardProps) {
 
         {/* Actions */}
         <div className="flex items-center space-x-2">
-          <Button asChild variant="outline" size="sm">
-            <Link to="/issue/$issueId" params={{ issueId: issue.id.toString() }}>
-              <Eye className="h-4 w-4 mr-1" />
-              View
-            </Link>
+          <Button variant="outline" size="sm" onClick={() => {
+            // TODO: Implement issue detail view
+            console.log('View issue:', issue.id)
+          }}>
+            <Eye className="h-4 w-4 mr-1" />
+            View
           </Button>
           
-          {issue.status !== 'in-progress' && (
+          {issue.status !== 'WIP' && (
             <Button 
               variant="outline" 
               size="sm"
-              onClick={() => updateStatusMutation.mutate('in-progress')}
+              onClick={() => updateStatusMutation.mutate('WIP')}
               disabled={updateStatusMutation.isPending}
             >
               <Play className="h-4 w-4 mr-1" />
@@ -193,11 +194,11 @@ export function IssueCard({ issue }: IssueCardProps) {
             </Button>
           )}
           
-          {issue.status !== 'completed' && (
+          {issue.status !== 'Done' && (
             <Button 
               variant="outline" 
               size="sm"
-              onClick={() => updateStatusMutation.mutate('completed')}
+              onClick={() => updateStatusMutation.mutate('Done')}
               disabled={updateStatusMutation.isPending}
               className="text-green-600 hover:text-green-700 hover:bg-green-50"
             >
@@ -213,11 +214,11 @@ export function IssueCard({ issue }: IssueCardProps) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => updateStatusMutation.mutate('testing')}>
-                Move to Testing
+              <DropdownMenuItem onClick={() => updateStatusMutation.mutate('Todo')}>
+                Move to Todo
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => updateStatusMutation.mutate('closed')}>
-                Close Issue
+              <DropdownMenuItem onClick={() => updateStatusMutation.mutate('Backlog')}>
+                Move to Backlog
               </DropdownMenuItem>
               <DropdownMenuItem 
                 onClick={() => deleteMutation.mutate()}

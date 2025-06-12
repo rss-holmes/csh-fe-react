@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { useFormWithSchema } from '@/hooks/useFormWithSchema'
 import {
   Sheet,
   SheetContent,
@@ -43,8 +42,7 @@ export function CreateBoardSidebar({ isOpen, onClose }: CreateBoardSidebarProps)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const queryClient = useQueryClient()
 
-  const form = useForm<CreateBoardInput>({
-    resolver: zodResolver(createBoardSchema),
+  const form = useFormWithSchema<CreateBoardInput>(createBoardSchema, {
     defaultValues: {
       name: '',
       description: '',
@@ -57,7 +55,7 @@ export function CreateBoardSidebar({ isOpen, onClose }: CreateBoardSidebarProps)
   const createMutation = useMutation({
     mutationFn: boardApi.createBoard,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.boards.workspaceBoards._def })
+      queryClient.invalidateQueries({ queryKey: queryKeys.boards.all })
       toast.success('Board created successfully')
       form.reset()
       onClose()

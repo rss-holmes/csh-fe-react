@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { useFormWithSchema } from '@/hooks/useFormWithSchema'
 import {
   Sheet,
   SheetContent,
@@ -40,7 +39,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { Separator } from '@/components/ui/separator'
 import { toast } from 'sonner'
 import { Trash2, AlertTriangle } from 'lucide-react'
 import { queryKeys } from '@/lib/queryKeys'
@@ -59,8 +57,7 @@ export function EditBoardSidebar({ isOpen, onClose, board }: EditBoardSidebarPro
   const [isDeleting, setIsDeleting] = useState(false)
   const queryClient = useQueryClient()
 
-  const form = useForm<UpdateBoardInput>({
-    resolver: zodResolver(updateBoardSchema),
+  const form = useFormWithSchema<UpdateBoardInput>(updateBoardSchema, {
     defaultValues: {
       name: '',
       description: '',
@@ -86,7 +83,7 @@ export function EditBoardSidebar({ isOpen, onClose, board }: EditBoardSidebarPro
   const updateMutation = useMutation({
     mutationFn: (data: UpdateBoardInput) => boardApi.updateBoard(board.id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.boards.workspaceBoards._def })
+      queryClient.invalidateQueries({ queryKey: queryKeys.boards.all })
       queryClient.invalidateQueries({ queryKey: queryKeys.boards.board(board.id.toString()) })
       toast.success('Board updated successfully')
       onClose()
@@ -102,7 +99,7 @@ export function EditBoardSidebar({ isOpen, onClose, board }: EditBoardSidebarPro
   const deleteMutation = useMutation({
     mutationFn: () => boardApi.deleteBoard(board.id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.boards.workspaceBoards._def })
+      queryClient.invalidateQueries({ queryKey: queryKeys.boards.all })
       toast.success('Board deleted successfully')
       onClose()
     },

@@ -8,9 +8,9 @@ import { Skeleton } from '@/components/ui/skeleton'
 export function FeedbacksBody() {
   const { user } = useAuthStore()
 
-  const { data: feedbacks, isLoading, error } = useQuery({
+  const { data: feedbacks = [], isLoading, error } = useQuery({
     queryKey: queryKeys.feedbacks.workspaceFeedbacks(user?.workspaceId?.toString() || ''),
-    queryFn: feedbackApi.getWorkspaceFeedbacks,
+    queryFn: () => feedbackApi.getWorkspaceFeedbacks(user?.workspaceId?.toString()),
     enabled: !!user?.workspaceId,
   })
 

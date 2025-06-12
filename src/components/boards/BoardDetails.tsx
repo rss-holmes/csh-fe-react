@@ -36,7 +36,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { formatDateTime } from '@/utils/dateFormatter'
 
 export function BoardDetails() {
-  const { boardId } = useParams({ from: '/board/$boardId' })
+  const { boardId } = useParams({ from: '/_protected/board/$boardId' })
   const [editSidebarOpen, setEditSidebarOpen] = useState(false)
   const [createFeedbackOpen, setCreateFeedbackOpen] = useState(false)
   const queryClient = useQueryClient()
@@ -180,7 +180,7 @@ export function BoardDetails() {
             <div className="flex flex-wrap gap-2">
               <Badge 
                 variant="outline" 
-                className={`${getStatusColor(board.status)}`}
+                className={`${getStatusColor(board.status || 'active')}`}
               >
                 {board.status || 'Active'}
               </Badge>
@@ -234,10 +234,10 @@ export function BoardDetails() {
                 </DropdownMenuItem>
                 {board.isPublic && (
                   <DropdownMenuItem asChild>
-                    <Link to={`/public/board/${board.publicUrl || board.id}`} target="_blank">
+                    <a href={`/public/board/${board.publicUrl || board.id}`} target="_blank" rel="noopener noreferrer">
                       <Eye className="h-4 w-4 mr-2" />
                       View Public Page
-                    </Link>
+                    </a>
                   </DropdownMenuItem>
                 )}
               </DropdownMenuContent>

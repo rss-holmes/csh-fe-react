@@ -15,16 +15,12 @@ import { IssueCard } from '../issues/IssueCard'
 import { AddIssueModal } from './AddIssueModal'
 import { 
   Plus, 
-  Search, 
-  Filter,
+  Search,
   ArrowUp,
-  ArrowDown,
-  Calendar,
-  User
+  ArrowDown
 } from 'lucide-react'
 import { queryKeys } from '@/lib/queryKeys'
 import * as issueApi from '@/api/issue'
-import type { Issue } from '@/api/issue'
 
 interface IssueListProps {
   boardId: number

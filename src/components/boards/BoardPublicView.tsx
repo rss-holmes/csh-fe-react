@@ -29,8 +29,6 @@ import {
   Plus,
   ThumbsUp,
   Search,
-  Filter,
-  ArrowUp,
   TrendingUp,
   Users,
   Calendar

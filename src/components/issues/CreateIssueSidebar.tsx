@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { useFormWithSchema } from '@/hooks/useFormWithSchema'
 import {
   Sheet,
   SheetContent,
@@ -43,13 +42,12 @@ export function CreateIssueSidebar({ isOpen, onClose }: CreateIssueSidebarProps)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const queryClient = useQueryClient()
 
-  const form = useForm<CreateIssueInput>({
-    resolver: zodResolver(createIssueSchema),
+  const form = useFormWithSchema<CreateIssueInput>(createIssueSchema, {
     defaultValues: {
       title: '',
       description: '',
       priority: 2,
-      status: 'open',
+      status: 'No Status',
     },
   })
 
@@ -68,7 +66,7 @@ export function CreateIssueSidebar({ isOpen, onClose }: CreateIssueSidebarProps)
   const createMutation = useMutation({
     mutationFn: issueApi.createIssue,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.issues.workspaceIssues._def })
+      queryClient.invalidateQueries({ queryKey: queryKeys.issues.all })
       toast.success('Issue created successfully')
       form.reset()
       onClose()

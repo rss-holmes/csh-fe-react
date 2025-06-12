@@ -28,6 +28,11 @@ export const queryKeys = {
       [...queryKeys.boards.lists(), workspaceId, filters] as const,
     details: () => [...queryKeys.boards.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.boards.details(), id] as const,
+    board: (id: string) => [...queryKeys.boards.all, 'board', id] as const,
+    workspaceBoards: (workspaceId: string) => 
+      [...queryKeys.boards.all, 'workspace', workspaceId] as const,
+    boardStats: (boardId: string) => 
+      [...queryKeys.boards.all, 'stats', boardId] as const,
     public: (publicUrl: string) => [...queryKeys.boards.all, 'public', publicUrl] as const,
   },
 
@@ -39,6 +44,13 @@ export const queryKeys = {
       [...queryKeys.issues.lists(), boardId, filters] as const,
     details: () => [...queryKeys.issues.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.issues.details(), id] as const,
+    issue: (id: string) => [...queryKeys.issues.all, 'issue', id] as const,
+    workspaceIssues: (workspaceId: string) => 
+      [...queryKeys.issues.all, 'workspace', workspaceId] as const,
+    boardIssues: (boardId: string) => 
+      [...queryKeys.issues.all, 'board', boardId] as const,
+    issueComments: (issueId: string) => 
+      [...queryKeys.issues.all, 'comments', issueId] as const,
   },
 
   // Feedback queries
@@ -49,6 +61,10 @@ export const queryKeys = {
       [...queryKeys.feedbacks.lists(), workspaceId, filters] as const,
     details: () => [...queryKeys.feedbacks.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.feedbacks.details(), id] as const,
+    boardFeedbacks: (boardId: string) => 
+      [...queryKeys.feedbacks.all, 'board', boardId] as const,
+    workspaceFeedbacks: (workspaceId: string) => 
+      [...queryKeys.feedbacks.all, 'workspace', workspaceId] as const,
   },
 
   // User/Customer queries
@@ -59,6 +75,18 @@ export const queryKeys = {
       [...queryKeys.users.lists(), workspaceId, filters] as const,
     details: () => [...queryKeys.users.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.users.details(), id] as const,
+    workspaceUsers: (workspaceId: string) => 
+      [...queryKeys.users.all, 'workspace', workspaceId] as const,
+  },
+
+  // Customer queries
+  customers: {
+    all: ['customers'] as const,
+    lists: () => [...queryKeys.customers.all, 'list'] as const,
+    list: (workspaceId: string, filters?: string) => 
+      [...queryKeys.customers.lists(), workspaceId, filters] as const,
+    details: () => [...queryKeys.customers.all, 'detail'] as const,
+    detail: (id: string) => [...queryKeys.customers.details(), id] as const,
   },
 
   // Company queries
@@ -92,6 +120,18 @@ export const queryKeys = {
     all: ['s3'] as const,
     uploadUrl: (fileName: string, fileType: string) => 
       [...queryKeys.s3.all, 'uploadUrl', fileName, fileType] as const,
+  },
+
+  // Public boards queries
+  publicBoards: {
+    all: ['publicBoards'] as const,
+    board: (boardUrl: string) => [...queryKeys.publicBoards.all, 'board', boardUrl] as const,
+    boardIssues: (boardUrl: string) => 
+      [...queryKeys.publicBoards.all, 'issues', boardUrl] as const,
+    issue: (boardUrl: string, issueId: string) => 
+      [...queryKeys.publicBoards.all, 'issue', boardUrl, issueId] as const,
+    issueComments: (boardUrl: string, issueId: string) => 
+      [...queryKeys.publicBoards.all, 'comments', boardUrl, issueId] as const,
   },
 } as const
 

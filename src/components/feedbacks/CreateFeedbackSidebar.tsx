@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { useFormWithSchema } from '@/hooks/useFormWithSchema'
 import {
   Sheet,
   SheetContent,
@@ -12,7 +11,6 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -38,19 +36,19 @@ import { createFeedbackSchema, type CreateFeedbackInput } from '@/formSchemas/fe
 interface CreateFeedbackSidebarProps {
   isOpen: boolean
   onClose: () => void
+  defaultBoardId?: number
 }
 
 export function CreateFeedbackSidebar({ isOpen, onClose }: CreateFeedbackSidebarProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const queryClient = useQueryClient()
 
-  const form = useForm<CreateFeedbackInput>({
-    resolver: zodResolver(createFeedbackSchema),
+  const form = useFormWithSchema<CreateFeedbackInput>(createFeedbackSchema, {
     defaultValues: {
       title: '',
       description: '',
-      type: 'feature',
-      priority: 1,
+      type: 'Feature Request',
+      sentiment: '',
       source: 'manual',
     },
   })
@@ -70,7 +68,7 @@ export function CreateFeedbackSidebar({ isOpen, onClose }: CreateFeedbackSidebar
   const createMutation = useMutation({
     mutationFn: feedbackApi.createFeedback,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.feedbacks.workspaceFeedbacks._def })
+      queryClient.invalidateQueries({ queryKey: queryKeys.feedbacks.all })
       toast.success('Feedback created successfully')
       form.reset()
       onClose()

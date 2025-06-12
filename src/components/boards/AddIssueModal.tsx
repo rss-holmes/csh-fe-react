@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { useFormWithSchema } from '@/hooks/useFormWithSchema'
 import {
   Dialog,
   DialogContent,
@@ -31,7 +30,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { toast } from 'sonner'
-import { Plus, Search, CheckCircle2 } from 'lucide-react'
+import { Search, CheckCircle2 } from 'lucide-react'
 import { queryKeys } from '@/lib/queryKeys'
 import * as issueApi from '@/api/issue'
 import * as userApi from '@/api/user'
@@ -49,25 +48,24 @@ export function AddIssueModal({ isOpen, onClose, boardId }: AddIssueModalProps) 
   const [existingIssueSearch, setExistingIssueSearch] = useState('')
   const queryClient = useQueryClient()
 
-  const form = useForm<CreateIssueInput>({
-    resolver: zodResolver(createIssueSchema),
+  const form = useFormWithSchema<CreateIssueInput>(createIssueSchema, {
     defaultValues: {
       title: '',
       description: '',
       priority: 2,
-      status: 'open',
+      status: 'No Status' as const,
       boardId: boardId,
     },
   })
 
   // Fetch users for assignment
-  const { data: users } = useQuery({
+  const { data: users = [] } = useQuery({
     queryKey: queryKeys.users.workspaceUsers(''),
     queryFn: userApi.getWorkspaceUsers,
   })
 
   // Fetch existing issues from other boards
-  const { data: existingIssues } = useQuery({
+  const { data: existingIssues = [] } = useQuery({
     queryKey: queryKeys.issues.workspaceIssues(''),
     queryFn: issueApi.getWorkspaceIssues,
   })
@@ -76,7 +74,7 @@ export function AddIssueModal({ isOpen, onClose, boardId }: AddIssueModalProps) 
     mutationFn: issueApi.createIssue,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.issues.boardIssues(boardId.toString()) })
-      queryClient.invalidateQueries({ queryKey: queryKeys.issues.workspaceIssues._def })
+      queryClient.invalidateQueries({ queryKey: queryKeys.issues.workspaceIssues('') })
       toast.success('Issue created successfully')
       form.reset()
       onClose()
@@ -98,7 +96,7 @@ export function AddIssueModal({ isOpen, onClose, boardId }: AddIssueModalProps) 
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.issues.boardIssues(boardId.toString()) })
-      queryClient.invalidateQueries({ queryKey: queryKeys.issues.workspaceIssues._def })
+      queryClient.invalidateQueries({ queryKey: queryKeys.issues.workspaceIssues('') })
       toast.success(`${selectedExistingIssues.length} issue(s) linked to board`)
       setSelectedExistingIssues([])
       onClose()
@@ -113,7 +111,7 @@ export function AddIssueModal({ isOpen, onClose, boardId }: AddIssueModalProps) 
 
   const onSubmit = (data: CreateIssueInput) => {
     setIsSubmitting(true)
-    createMutation.mutate({ ...data, boardId })
+    createMutation.mutate(data)
   }
 
   const handleLinkExisting = () => {
@@ -133,11 +131,11 @@ export function AddIssueModal({ isOpen, onClose, boardId }: AddIssueModalProps) 
   }
 
   // Filter existing issues (exclude those already on this board)
-  const filteredExistingIssues = existingIssues?.filter(issue => 
+  const filteredExistingIssues = existingIssues.filter(issue => 
     issue.boardId !== boardId &&
     (issue.title.toLowerCase().includes(existingIssueSearch.toLowerCase()) ||
      issue.description?.toLowerCase().includes(existingIssueSearch.toLowerCase()))
-  ) || []
+  )
 
   const toggleIssueSelection = (issueId: number) => {
     setSelectedExistingIssues(prev => 
@@ -293,7 +291,7 @@ export function AddIssueModal({ isOpen, onClose, boardId }: AddIssueModalProps) 
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {users?.map((user) => (
+                          {users.map((user) => (
                             <SelectItem key={user.id} value={user.id.toString()}>
                               {user.name} ({user.email})
                             </SelectItem>

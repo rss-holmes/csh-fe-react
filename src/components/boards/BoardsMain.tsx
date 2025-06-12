@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Plus, Search, Filter, Grid, List } from 'lucide-react'
+import { Plus, Search, Grid, List } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -31,9 +31,9 @@ export function BoardsMain() {
 
   const { user } = useAuthStore()
 
-  const { data: boards, isLoading, error } = useQuery({
+  const { data: boards = [], isLoading, error } = useQuery({
     queryKey: queryKeys.boards.workspaceBoards(user?.workspaceId?.toString() || ''),
-    queryFn: boardApi.getWorkspaceBoards,
+    queryFn: () => boardApi.getWorkspaceBoards(),
     enabled: !!user?.workspaceId,
   })
 
@@ -48,7 +48,7 @@ export function BoardsMain() {
   }
 
   // Filter boards based on search and filters
-  const filteredBoards = boards?.filter((board) => {
+  const filteredBoards = boards.filter((board) => {
     const matchesSearch = board.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          board.description?.toLowerCase().includes(searchQuery.toLowerCase())
     
@@ -59,11 +59,11 @@ export function BoardsMain() {
                              (visibilityFilter === 'private' && !board.isPublic)
     
     return matchesSearch && matchesStatus && matchesVisibility
-  }) || []
+  })
 
-  const activeBoards = boards?.filter(board => board.status === 'active').length || 0
-  const publicBoards = boards?.filter(board => board.isPublic).length || 0
-  const totalFeedbacks = boards?.reduce((sum, board) => sum + (board.feedbacksCount || 0), 0) || 0
+  const activeBoards = boards.filter(board => board.status === 'active').length
+  const publicBoards = boards.filter(board => board.isPublic).length
+  const totalFeedbacks = boards.reduce((sum, board) => sum + (board.feedbacksCount || 0), 0)
 
   if (isLoading) {
     return (

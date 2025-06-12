@@ -15,6 +15,8 @@ export const createFeedbackSchema = z.object({
   customerId: z.number().optional(),
   source: z.enum(['', 'slack', 'hubspot', 'manual', 'email']),
   issues: z.array(z.number()).optional(),
+  priority: z.number().min(1).max(4).optional(),
+  boardId: z.number().optional(),
 })
 
 export const readFeedbackSchema = z.object({

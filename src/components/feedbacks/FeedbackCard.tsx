@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -41,7 +40,7 @@ export function FeedbackCard({ feedback }: FeedbackCardProps) {
   const deleteMutation = useMutation({
     mutationFn: () => feedbackApi.deleteFeedback(feedback.id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.feedbacks.workspaceFeedbacks._def })
+      queryClient.invalidateQueries({ queryKey: queryKeys.feedbacks.all })
       toast.success('Feedback deleted successfully')
     },
     onError: () => {
@@ -52,7 +51,7 @@ export function FeedbackCard({ feedback }: FeedbackCardProps) {
   const resolveMutation = useMutation({
     mutationFn: () => feedbackApi.resolveFeedback(feedback.id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.feedbacks.workspaceFeedbacks._def })
+      queryClient.invalidateQueries({ queryKey: queryKeys.feedbacks.all })
       toast.success('Feedback resolved successfully')
     },
     onError: () => {
@@ -63,7 +62,7 @@ export function FeedbackCard({ feedback }: FeedbackCardProps) {
   const markLaterMutation = useMutation({
     mutationFn: () => feedbackApi.markLater(feedback.id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.feedbacks.workspaceFeedbacks._def })
+      queryClient.invalidateQueries({ queryKey: queryKeys.feedbacks.all })
       toast.success('Feedback marked for later')
     },
     onError: () => {
@@ -74,7 +73,7 @@ export function FeedbackCard({ feedback }: FeedbackCardProps) {
   const markSpamMutation = useMutation({
     mutationFn: () => feedbackApi.markAsSpam(feedback.id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.feedbacks.workspaceFeedbacks._def })
+      queryClient.invalidateQueries({ queryKey: queryKeys.feedbacks.all })
       toast.success('Feedback marked as spam')
     },
     onError: () => {
@@ -82,18 +81,6 @@ export function FeedbackCard({ feedback }: FeedbackCardProps) {
     },
   })
 
-  const getBadgeVariant = (type: string) => {
-    switch (type?.toLowerCase()) {
-      case 'positive':
-        return 'default'
-      case 'negative':
-        return 'destructive'
-      case 'neutral':
-        return 'secondary'
-      default:
-        return 'outline'
-    }
-  }
 
   const getSentimentColor = (sentiment?: string) => {
     switch (sentiment?.toLowerCase()) {
@@ -184,11 +171,12 @@ export function FeedbackCard({ feedback }: FeedbackCardProps) {
 
         {/* Actions */}
         <div className="flex items-center space-x-2">
-          <Button asChild variant="outline" size="sm">
-            <Link to="/feedback/$feedbackId" params={{ feedbackId: feedback.id.toString() }}>
-              <Eye className="h-4 w-4 mr-1" />
-              View
-            </Link>
+          <Button variant="outline" size="sm" onClick={() => {
+            // TODO: Implement feedback detail view
+            console.log('View feedback:', feedback.id)
+          }}>
+            <Eye className="h-4 w-4 mr-1" />
+            View
           </Button>
           
           <Button 

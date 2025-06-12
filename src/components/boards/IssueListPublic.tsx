@@ -18,31 +18,11 @@ import {
 import { toast } from 'sonner'
 import { queryKeys } from '@/lib/queryKeys'
 import * as publicBoardsApi from '@/api/publicBoards'
+import type { PublicBoardIssue } from '@/api/publicBoards'
 import { IssueDetailsModalPublic } from './IssueDetailsModalPublic'
 import { formatDateTime } from '@/utils/dateFormatter'
-
-interface PublicIssue {
-  id: number
-  title: string
-  description?: string
-  priority: number
-  status: string
-  upvotes?: number
-  downvotes?: number
-  commentsCount?: number
-  createdAt: string
-  updatedAt: string
-  dueDate?: string
-  createdBy?: {
-    id: number
-    name: string
-  }
-  hasVoted?: boolean
-  userVoteType?: 'up' | 'down'
-}
-
 interface IssueListPublicProps {
-  issues: PublicIssue[]
+  issues: PublicBoardIssue[]
   boardUrl: string
 }
 
@@ -101,7 +81,7 @@ export function IssueListPublic({ issues, boardUrl }: IssueListPublicProps) {
     }
   }
 
-  const getVoteScore = (issue: PublicIssue) => {
+  const getVoteScore = (issue: PublicBoardIssue) => {
     return (issue.upvotes || 0) - (issue.downvotes || 0)
   }
 
@@ -189,10 +169,10 @@ export function IssueListPublic({ issues, boardUrl }: IssueListPublicProps) {
                           <span className="ml-1">{getPriorityLabel(issue.priority)}</span>
                         </Badge>
                         
-                        {issue.commentsCount && issue.commentsCount > 0 && (
+                        {issue.comments && issue.comments > 0 && (
                           <Badge variant="outline" className="text-xs text-blue-600 bg-blue-100 border-blue-300">
                             <MessageSquare className="h-3 w-3 mr-1" />
-                            {issue.commentsCount}
+                            {issue.comments}
                           </Badge>
                         )}
                       </div>
