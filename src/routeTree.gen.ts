@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProtectedIssuesRouteImport } from './routes/_protected/issues'
 import { Route as ProtectedFeedbacksRouteImport } from './routes/_protected/feedbacks'
 import { Route as ProtectedDashboardRouteImport } from './routes/_protected/dashboard'
 import { Route as AuthSignupRouteImport } from './routes/_auth/signup'
@@ -29,6 +30,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ProtectedIssuesRoute = ProtectedIssuesRouteImport.update({
+  id: '/issues',
+  path: '/issues',
+  getParentRoute: () => ProtectedRoute,
 } as any)
 const ProtectedFeedbacksRoute = ProtectedFeedbacksRouteImport.update({
   id: '/feedbacks',
@@ -58,6 +64,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof AuthSignupRoute
   '/dashboard': typeof ProtectedDashboardRoute
   '/feedbacks': typeof ProtectedFeedbacksRoute
+  '/issues': typeof ProtectedIssuesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -66,6 +73,7 @@ export interface FileRoutesByTo {
   '/signup': typeof AuthSignupRoute
   '/dashboard': typeof ProtectedDashboardRoute
   '/feedbacks': typeof ProtectedFeedbacksRoute
+  '/issues': typeof ProtectedIssuesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -76,12 +84,20 @@ export interface FileRoutesById {
   '/_auth/signup': typeof AuthSignupRoute
   '/_protected/dashboard': typeof ProtectedDashboardRoute
   '/_protected/feedbacks': typeof ProtectedFeedbacksRoute
+  '/_protected/issues': typeof ProtectedIssuesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '' | '/login' | '/signup' | '/dashboard' | '/feedbacks'
+  fullPaths:
+    | '/'
+    | ''
+    | '/login'
+    | '/signup'
+    | '/dashboard'
+    | '/feedbacks'
+    | '/issues'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '' | '/login' | '/signup' | '/dashboard' | '/feedbacks'
+  to: '/' | '' | '/login' | '/signup' | '/dashboard' | '/feedbacks' | '/issues'
   id:
     | '__root__'
     | '/'
@@ -91,6 +107,7 @@ export interface FileRouteTypes {
     | '/_auth/signup'
     | '/_protected/dashboard'
     | '/_protected/feedbacks'
+    | '/_protected/issues'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -121,6 +138,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_protected/issues': {
+      id: '/_protected/issues'
+      path: '/issues'
+      fullPath: '/issues'
+      preLoaderRoute: typeof ProtectedIssuesRouteImport
+      parentRoute: typeof ProtectedRoute
     }
     '/_protected/feedbacks': {
       id: '/_protected/feedbacks'
@@ -168,11 +192,13 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 interface ProtectedRouteChildren {
   ProtectedDashboardRoute: typeof ProtectedDashboardRoute
   ProtectedFeedbacksRoute: typeof ProtectedFeedbacksRoute
+  ProtectedIssuesRoute: typeof ProtectedIssuesRoute
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedDashboardRoute: ProtectedDashboardRoute,
   ProtectedFeedbacksRoute: ProtectedFeedbacksRoute,
+  ProtectedIssuesRoute: ProtectedIssuesRoute,
 }
 
 const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(
