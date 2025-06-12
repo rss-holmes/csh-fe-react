@@ -3,6 +3,7 @@ import { subscribeWithSelector } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
 import { jwtDecode } from 'jwt-decode'
 import * as authApi from '@/api/auth'
+import * as workspaceApi from '@/api/workspace'
 import type { LoginInput, SignupInput, GoogleAuthInput } from '@/formSchemas/authSchema'
 
 // Types (these will be moved to types folder later)
@@ -133,12 +134,11 @@ export const useAuthStore = create<AuthStore>()(
 
       switchWorkspace: async (newWorkspaceId: number) => {
         try {
-          // This will be implemented when we create the API layer
-          console.log('Switching workspace to:', newWorkspaceId)
-          // const response = await switchWorkspace(newWorkspaceId)
-          // get().setToken(response.token)
+          const response = await workspaceApi.switchWorkspace(newWorkspaceId)
+          get().setToken(response.token)
         } catch (error) {
           console.error('Failed to switch workspace:', error)
+          throw error
         }
       },
     }))

@@ -1,5 +1,6 @@
-import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useAuthStore } from '@/stores/authStore'
+import { MainLayout } from '@/components/layout/MainLayout'
 
 /**
  * Protected route layout that requires authentication
@@ -18,22 +19,5 @@ export const Route = createFileRoute('/_protected')({
       })
     }
   },
-  component: ProtectedLayout,
+  component: MainLayout,
 })
-
-function ProtectedLayout() {
-  return (
-    <div className="min-h-screen bg-background">
-      {/* This will be replaced with actual layout components later */}
-      <div className="flex">
-        {/* Sidebar will go here */}
-        <div className="flex-1">
-          {/* Header will go here */}
-          <main className="p-6">
-            <Outlet />
-          </main>
-        </div>
-      </div>
-    </div>
-  )
-}
