@@ -9,21 +9,26 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PublicRouteImport } from './routes/public'
 import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PublicBoardRouteImport } from './routes/public/board'
 import { Route as ProtectedIssuesRouteImport } from './routes/_protected/issues'
 import { Route as ProtectedFeedbacksRouteImport } from './routes/_protected/feedbacks'
 import { Route as ProtectedDashboardRouteImport } from './routes/_protected/dashboard'
 import { Route as ProtectedBoardsRouteImport } from './routes/_protected/boards'
 import { Route as ProtectedBoardRouteImport } from './routes/_protected/board'
-import { Route as ProtectedBoardIdRouteImport } from './routes/_protected/board/$boardId'
-import { Route as PublicRouteImport } from './routes/public'
-import { Route as PublicBoardRouteImport } from './routes/public/board'
-import { Route as PublicBoardUrlRouteImport } from './routes/public/board/$boardUrl'
 import { Route as AuthSignupRouteImport } from './routes/_auth/signup'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
+import { Route as PublicBoardBoardUrlRouteImport } from './routes/public/board/$boardUrl'
+import { Route as ProtectedBoardBoardIdRouteImport } from './routes/_protected/board/$boardId'
 
+const PublicRoute = PublicRouteImport.update({
+  id: '/public',
+  path: '/public',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProtectedRoute = ProtectedRouteImport.update({
   id: '/_protected',
   getParentRoute: () => rootRouteImport,
@@ -36,6 +41,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const PublicBoardRoute = PublicBoardRouteImport.update({
+  id: '/board',
+  path: '/board',
+  getParentRoute: () => PublicRoute,
 } as any)
 const ProtectedIssuesRoute = ProtectedIssuesRouteImport.update({
   id: '/issues',
@@ -52,16 +62,6 @@ const ProtectedDashboardRoute = ProtectedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => ProtectedRoute,
 } as any)
-const AuthSignupRoute = AuthSignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
-  getParentRoute: () => AuthRoute,
-} as any)
-const AuthLoginRoute = AuthLoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => AuthRoute,
-} as any)
 const ProtectedBoardsRoute = ProtectedBoardsRouteImport.update({
   id: '/boards',
   path: '/boards',
@@ -72,56 +72,56 @@ const ProtectedBoardRoute = ProtectedBoardRouteImport.update({
   path: '/board',
   getParentRoute: () => ProtectedRoute,
 } as any)
-const ProtectedBoardIdRoute = ProtectedBoardIdRouteImport.update({
-  id: '/board/$boardId',
-  path: '/board/$boardId',
-  getParentRoute: () => ProtectedRoute,
+const AuthSignupRoute = AuthSignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => AuthRoute,
 } as any)
-const PublicRoute = PublicRouteImport.update({
-  id: '/public',
-  path: '/public',
-  getParentRoute: () => rootRouteImport,
+const AuthLoginRoute = AuthLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AuthRoute,
 } as any)
-const PublicBoardRoute = PublicBoardRouteImport.update({
-  id: '/board',
-  path: '/board',
-  getParentRoute: () => PublicRoute,
+const PublicBoardBoardUrlRoute = PublicBoardBoardUrlRouteImport.update({
+  id: '/$boardUrl',
+  path: '/$boardUrl',
+  getParentRoute: () => PublicBoardRoute,
 } as any)
-const PublicBoardUrlRoute = PublicBoardUrlRouteImport.update({
-  id: '/board/$boardUrl',
-  path: '/board/$boardUrl',
-  getParentRoute: () => PublicRoute,
+const ProtectedBoardBoardIdRoute = ProtectedBoardBoardIdRouteImport.update({
+  id: '/$boardId',
+  path: '/$boardId',
+  getParentRoute: () => ProtectedBoardRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '': typeof ProtectedRouteWithChildren
+  '/public': typeof PublicRouteWithChildren
   '/login': typeof AuthLoginRoute
   '/signup': typeof AuthSignupRoute
+  '/board': typeof ProtectedBoardRouteWithChildren
+  '/boards': typeof ProtectedBoardsRoute
   '/dashboard': typeof ProtectedDashboardRoute
   '/feedbacks': typeof ProtectedFeedbacksRoute
   '/issues': typeof ProtectedIssuesRoute
-  '/boards': typeof ProtectedBoardsRoute
-  '/board': typeof ProtectedBoardRoute
-  '/board/$boardId': typeof ProtectedBoardIdRoute
-  '/public': typeof PublicRoute
-  '/public/board': typeof PublicBoardRoute
-  '/public/board/$boardUrl': typeof PublicBoardUrlRoute
+  '/public/board': typeof PublicBoardRouteWithChildren
+  '/board/$boardId': typeof ProtectedBoardBoardIdRoute
+  '/public/board/$boardUrl': typeof PublicBoardBoardUrlRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '': typeof ProtectedRouteWithChildren
+  '/public': typeof PublicRouteWithChildren
   '/login': typeof AuthLoginRoute
   '/signup': typeof AuthSignupRoute
+  '/board': typeof ProtectedBoardRouteWithChildren
+  '/boards': typeof ProtectedBoardsRoute
   '/dashboard': typeof ProtectedDashboardRoute
   '/feedbacks': typeof ProtectedFeedbacksRoute
   '/issues': typeof ProtectedIssuesRoute
-  '/boards': typeof ProtectedBoardsRoute
-  '/board': typeof ProtectedBoardRoute
-  '/board/$boardId': typeof ProtectedBoardIdRoute
-  '/public': typeof PublicRoute
-  '/public/board': typeof PublicBoardRoute
-  '/public/board/$boardUrl': typeof PublicBoardUrlRoute
+  '/public/board': typeof PublicBoardRouteWithChildren
+  '/board/$boardId': typeof ProtectedBoardBoardIdRoute
+  '/public/board/$boardUrl': typeof PublicBoardBoardUrlRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -131,33 +131,46 @@ export interface FileRoutesById {
   '/public': typeof PublicRouteWithChildren
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/signup': typeof AuthSignupRoute
+  '/_protected/board': typeof ProtectedBoardRouteWithChildren
+  '/_protected/boards': typeof ProtectedBoardsRoute
   '/_protected/dashboard': typeof ProtectedDashboardRoute
   '/_protected/feedbacks': typeof ProtectedFeedbacksRoute
   '/_protected/issues': typeof ProtectedIssuesRoute
-  '/_protected/boards': typeof ProtectedBoardsRoute
-  '/_protected/board': typeof ProtectedBoardRoute
-  '/_protected/board/$boardId': typeof ProtectedBoardIdRoute
-  '/public/board': typeof PublicBoardRoute
-  '/public/board/$boardUrl': typeof PublicBoardUrlRoute
+  '/public/board': typeof PublicBoardRouteWithChildren
+  '/_protected/board/$boardId': typeof ProtectedBoardBoardIdRoute
+  '/public/board/$boardUrl': typeof PublicBoardBoardUrlRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | ''
+    | '/public'
     | '/login'
     | '/signup'
+    | '/board'
+    | '/boards'
     | '/dashboard'
     | '/feedbacks'
     | '/issues'
-    | '/boards'
-    | '/board'
-    | '/board/$boardId'
-    | '/public'
     | '/public/board'
+    | '/board/$boardId'
     | '/public/board/$boardUrl'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '' | '/login' | '/signup' | '/dashboard' | '/feedbacks' | '/issues' | '/boards' | '/board' | '/board/$boardId' | '/public' | '/public/board' | '/public/board/$boardUrl'
+  to:
+    | '/'
+    | ''
+    | '/public'
+    | '/login'
+    | '/signup'
+    | '/board'
+    | '/boards'
+    | '/dashboard'
+    | '/feedbacks'
+    | '/issues'
+    | '/public/board'
+    | '/board/$boardId'
+    | '/public/board/$boardUrl'
   id:
     | '__root__'
     | '/'
@@ -166,13 +179,13 @@ export interface FileRouteTypes {
     | '/public'
     | '/_auth/login'
     | '/_auth/signup'
+    | '/_protected/board'
+    | '/_protected/boards'
     | '/_protected/dashboard'
     | '/_protected/feedbacks'
     | '/_protected/issues'
-    | '/_protected/boards'
-    | '/_protected/board'
-    | '/_protected/board/$boardId'
     | '/public/board'
+    | '/_protected/board/$boardId'
     | '/public/board/$boardUrl'
   fileRoutesById: FileRoutesById
 }
@@ -185,6 +198,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/public': {
+      id: '/public'
+      path: '/public'
+      fullPath: '/public'
+      preLoaderRoute: typeof PublicRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_protected': {
       id: '/_protected'
       path: ''
@@ -205,6 +225,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/public/board': {
+      id: '/public/board'
+      path: '/board'
+      fullPath: '/public/board'
+      preLoaderRoute: typeof PublicBoardRouteImport
+      parentRoute: typeof PublicRoute
     }
     '/_protected/issues': {
       id: '/_protected/issues'
@@ -227,20 +254,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedDashboardRouteImport
       parentRoute: typeof ProtectedRoute
     }
-    '/_auth/signup': {
-      id: '/_auth/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof AuthSignupRouteImport
-      parentRoute: typeof AuthRoute
-    }
-    '/_auth/login': {
-      id: '/_auth/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof AuthLoginRouteImport
-      parentRoute: typeof AuthRoute
-    }
     '/_protected/boards': {
       id: '/_protected/boards'
       path: '/boards'
@@ -255,33 +268,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedBoardRouteImport
       parentRoute: typeof ProtectedRoute
     }
-    '/_protected/board/$boardId': {
-      id: '/_protected/board/$boardId'
-      path: '/board/$boardId'
-      fullPath: '/board/$boardId'
-      preLoaderRoute: typeof ProtectedBoardIdRouteImport
-      parentRoute: typeof ProtectedRoute
+    '/_auth/signup': {
+      id: '/_auth/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof AuthSignupRouteImport
+      parentRoute: typeof AuthRoute
     }
-    '/public': {
-      id: '/public'
-      path: '/public'
-      fullPath: '/public'
-      preLoaderRoute: typeof PublicRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/public/board': {
-      id: '/public/board'
-      path: '/board'
-      fullPath: '/public/board'
-      preLoaderRoute: typeof PublicBoardRouteImport
-      parentRoute: typeof PublicRoute
+    '/_auth/login': {
+      id: '/_auth/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof AuthLoginRouteImport
+      parentRoute: typeof AuthRoute
     }
     '/public/board/$boardUrl': {
       id: '/public/board/$boardUrl'
-      path: '/board/$boardUrl'
+      path: '/$boardUrl'
       fullPath: '/public/board/$boardUrl'
-      preLoaderRoute: typeof PublicBoardUrlRouteImport
-      parentRoute: typeof PublicRoute
+      preLoaderRoute: typeof PublicBoardBoardUrlRouteImport
+      parentRoute: typeof PublicBoardRoute
+    }
+    '/_protected/board/$boardId': {
+      id: '/_protected/board/$boardId'
+      path: '/$boardId'
+      fullPath: '/board/$boardId'
+      preLoaderRoute: typeof ProtectedBoardBoardIdRouteImport
+      parentRoute: typeof ProtectedBoardRoute
     }
   }
 }
@@ -298,41 +311,60 @@ const AuthRouteChildren: AuthRouteChildren = {
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
+interface ProtectedBoardRouteChildren {
+  ProtectedBoardBoardIdRoute: typeof ProtectedBoardBoardIdRoute
+}
+
+const ProtectedBoardRouteChildren: ProtectedBoardRouteChildren = {
+  ProtectedBoardBoardIdRoute: ProtectedBoardBoardIdRoute,
+}
+
+const ProtectedBoardRouteWithChildren = ProtectedBoardRoute._addFileChildren(
+  ProtectedBoardRouteChildren,
+)
+
 interface ProtectedRouteChildren {
+  ProtectedBoardRoute: typeof ProtectedBoardRouteWithChildren
+  ProtectedBoardsRoute: typeof ProtectedBoardsRoute
   ProtectedDashboardRoute: typeof ProtectedDashboardRoute
   ProtectedFeedbacksRoute: typeof ProtectedFeedbacksRoute
   ProtectedIssuesRoute: typeof ProtectedIssuesRoute
-  ProtectedBoardsRoute: typeof ProtectedBoardsRoute
-  ProtectedBoardRoute: typeof ProtectedBoardRoute
-  ProtectedBoardIdRoute: typeof ProtectedBoardIdRoute
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
+  ProtectedBoardRoute: ProtectedBoardRouteWithChildren,
+  ProtectedBoardsRoute: ProtectedBoardsRoute,
   ProtectedDashboardRoute: ProtectedDashboardRoute,
   ProtectedFeedbacksRoute: ProtectedFeedbacksRoute,
   ProtectedIssuesRoute: ProtectedIssuesRoute,
-  ProtectedBoardsRoute: ProtectedBoardsRoute,
-  ProtectedBoardRoute: ProtectedBoardRoute,
-  ProtectedBoardIdRoute: ProtectedBoardIdRoute,
 }
 
 const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(
   ProtectedRouteChildren,
 )
 
+interface PublicBoardRouteChildren {
+  PublicBoardBoardUrlRoute: typeof PublicBoardBoardUrlRoute
+}
+
+const PublicBoardRouteChildren: PublicBoardRouteChildren = {
+  PublicBoardBoardUrlRoute: PublicBoardBoardUrlRoute,
+}
+
+const PublicBoardRouteWithChildren = PublicBoardRoute._addFileChildren(
+  PublicBoardRouteChildren,
+)
+
 interface PublicRouteChildren {
-  PublicBoardRoute: typeof PublicBoardRoute
-  PublicBoardUrlRoute: typeof PublicBoardUrlRoute
+  PublicBoardRoute: typeof PublicBoardRouteWithChildren
 }
 
 const PublicRouteChildren: PublicRouteChildren = {
-  PublicBoardRoute: PublicBoardRoute,
-  PublicBoardUrlRoute: PublicBoardUrlRoute,
+  PublicBoardRoute: PublicBoardRouteWithChildren,
 }
 
-const PublicRouteWithChildren = PublicRoute._addFileChildren(
-  PublicRouteChildren,
-)
+const PublicRouteWithChildren =
+  PublicRoute._addFileChildren(PublicRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
