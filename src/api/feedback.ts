@@ -180,7 +180,7 @@ export const getWorkspaceFeedbacks = async (workspaceId?: string): Promise<Feedb
   try {
     const url = workspaceId ? `/feedbacks?workspaceId=${workspaceId}` : '/feedbacks'
     const response = await axiosInstance.get(url)
-    return response.data
+    return response.data.data || []
   } catch (error: any) {
     throw new Error(error.response?.data?.message || 'Get workspace feedbacks failed')
   }
@@ -244,7 +244,7 @@ export const getAICopilotChatReply = async (message: string): Promise<AICopilotR
 export const getBoardFeedbacks = async (boardId: number): Promise<Feedback[]> => {
   try {
     const response = await axiosInstance.get(`/boards/${boardId}/feedbacks`)
-    return response.data
+    return response.data.data || []
   } catch (error: any) {
     throw new Error(error.response?.data?.message || 'Get board feedbacks failed')
   }
