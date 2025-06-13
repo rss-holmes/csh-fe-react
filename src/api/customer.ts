@@ -77,7 +77,7 @@ export const updateCustomer = async (
 /**
  * Delete a customer
  */
-export const deleteCustomer = async (id: string): Promise<{ message: string }> => {
+export const deleteCustomer = async (id: number): Promise<{ message: string }> => {
   try {
     const response = await axiosInstance.delete(`/customers/${id}`)
     return response.data
@@ -125,10 +125,21 @@ export const getCustomerFeedbacks = async (id: number): Promise<CustomerFeedback
 /**
  * Bulk upload customers from a file
  */
-export const bulkUploadCustomers = async (fileName: string): Promise<{ message: string }> => {
+export const bulkUploadCustomers = async (file: File): Promise<{ 
+  success: boolean
+  message: string
+  total: number
+  processed: number
+  errors: Array<{ row: number; error: string }>
+}> => {
   try {
-    const response = await axiosInstance.post('/customers/bulk-upload', {
-      fileName,
+    const formData = new FormData()
+    formData.append('file', file)
+    
+    const response = await axiosInstance.post('/customers/bulk-upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
     })
     return response.data
   } catch (error: any) {

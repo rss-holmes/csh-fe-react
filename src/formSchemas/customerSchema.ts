@@ -15,6 +15,7 @@ export const readCustomerSchema = z.object({
   name: z.string().max(200),
   email: z.string().email().max(200).or(z.literal('')),
   workspaceId: z.number().positive(),
+  companyId: z.number().positive().nullable(),
   addedVia: z.enum(['', 'api', 'slack', 'manual']),
   segments: z.string().max(200).nullable(),
   designation: z.string().max(200).nullable(),
